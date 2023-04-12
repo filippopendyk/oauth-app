@@ -34,12 +34,12 @@ passport.use(new GitHubStrategy({
 }));
 
 
-
-
-
 /*
  *  Express Project Setup
 */
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
