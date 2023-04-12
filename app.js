@@ -67,15 +67,15 @@ app.use(session({
 
 app.get('/', (req, res) => {
   res.render('index', { user: req.user });
-})
+});
 
-app.get('/account', (req, res) => {
+app.get('/account', ensureAuthenticated, (req, res) => {
   res.render('account', { user: req.user });
 });
 
 app.get('/login', (req, res) => {
   res.render('login', { user: req.user });
-})
+});
 
 app.get('/logout', (req, res) => {
   req.logout();
@@ -88,7 +88,7 @@ app.get('/auth/github/callback', passport.authenticate('github', {
   failureRedirect: '/login',
   failureMessage: true,
   successRedirect: '/',
-}))
+}));
 
 
 
@@ -102,3 +102,9 @@ app.listen(PORT, () => console.log(`Listening on ${PORT}`));
  * ensureAuthenticated Callback Function
 */
 
+const ensureAuthenticated = (req, res, next) => {
+  if(req.isAuthenticated()){
+    return next();
+  }
+  res.redirect('/login');
+};
