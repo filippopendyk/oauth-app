@@ -21,6 +21,14 @@ const PORT = 3000;
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
 
+function ensureAuthenticated(req, res, next) {
+  if (req.isAuthenticated()) {
+    return next();
+  } else {
+    res.redirect("/login");
+  }
+}
+
 /*
  * Passport Configurations
 */
@@ -45,9 +53,6 @@ passport.deserializeUser(function(user, done){
  *  Express Project Setup
 */
 
-app.use(passport.initialize());
-app.use(passport.session());
-
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 app.use(partials());
@@ -58,6 +63,9 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
 }));
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 
 
@@ -82,11 +90,10 @@ app.get('/logout', (req, res) => {
   res.redirect('/');
 });
 
-app.get('/auth/github', passport.authenticate('github', {scope: []}));
+app.get('/auth/github', passport.authenticate('github', { scope: ['user'] }));
 
 app.get('/auth/github/callback', passport.authenticate('github', {
   failureRedirect: '/login',
-  failureMessage: true,
   successRedirect: '/',
 }));
 
@@ -101,10 +108,3 @@ app.listen(PORT, () => console.log(`Listening on ${PORT}`));
 /*
  * ensureAuthenticated Callback Function
 */
-
-const ensureAuthenticated = (req, res, next) => {
-  if(req.isAuthenticated()){
-    return next();
-  }
-  res.redirect('/login');
-};
