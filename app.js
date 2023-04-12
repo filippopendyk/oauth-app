@@ -33,6 +33,13 @@ passport.use(new GitHubStrategy({
   done(null, profile);
 }));
 
+passport.serializeUser(function(user, done){
+  done(null, user);
+});
+
+passport.deserializeUser(function(user, done){
+  done(null, user);
+});
 
 /*
  *  Express Project Setup
@@ -75,6 +82,13 @@ app.get('/logout', (req, res) => {
   res.redirect('/');
 });
 
+app.get('/auth/github', passport.authenticate('github', {scope: []}));
+
+app.get('/auth/github/callback', passport.authenticate('github', {
+  failureRedirect: '/login',
+  failureMessage: true,
+  successRedirect: '/',
+}))
 
 
 
